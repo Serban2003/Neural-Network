@@ -1,4 +1,6 @@
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,7 @@ public class Matrix {
                 this.data[i][j] += matrix.data[i][j];
     }
 
-    public Matrix subtract(Matrix a, Matrix b){
+    public static Matrix subtract(Matrix a, Matrix b){
         if(a.rows != b.rows || a.cols != b.cols){
             logger.error("The matrices don't have the same dimensions!");
             return new Matrix(1, 1);
@@ -48,12 +50,12 @@ public class Matrix {
         return result;
     }
 
-    public Matrix transpose(Matrix matrix){
-        Matrix result = new Matrix(matrix.rows, matrix.cols);
+    public static Matrix transpose(Matrix matrix){
+        Matrix result = new Matrix(matrix.cols, matrix.rows);
 
         for(int i = 0; i < matrix.rows; ++i)
             for(int j = 0; j < matrix.cols; ++j)
-                result.data[i][j] = matrix.data[j][i];
+                result.data[j][i] = matrix.data[i][j];
 
         return result;
     }
@@ -75,7 +77,7 @@ public class Matrix {
                 this.data[i][j] *= matrix.data[i][j];
     }
 
-    public Matrix multiply(Matrix a, Matrix b){
+    public static Matrix multiply(Matrix a, Matrix b){
         if(a.cols != b.rows){
             logger.error("The matrices don't have the same dimensions!");
             return new Matrix(1, 1);
@@ -90,6 +92,47 @@ public class Matrix {
 
                 result.data[i][j] = sum;
             }
+        return result;
+    }
+
+    public void sigmoid(){
+        //sigmoid activation function
+        //f : [0, 1] -> [-1, 1]
+        //f(x) = 1 / (1 + e^-x)
+
+        for(int i = 0; i < rows; ++i)
+            for(int j = 0; j < cols; ++j)
+                this.data[i][j] = 1 / (1 + Math.exp(-this.data[i][j]));
+    }
+
+    public  Matrix derivativeSigmoid(){
+        //derivative of sigmoid function
+        //g : [0, 1] -> [0, 1 / 4]
+        //g(x) = x * (1 - x)
+
+        Matrix result = new Matrix(rows, cols);
+        for(int  i = 0; i < rows; ++i)
+            for(int j = 0; j < cols; ++j)
+                result.data[i][j] = this.data[i][j] * (1 - this.data[i][j]);
+
+        return result;
+    }
+
+    public static Matrix transformFromArray(double[] array){
+        Matrix result = new Matrix(array.length, 1);
+        for(int i = 0; i < array.length; ++i)
+            result.data[i][0] = array[i];
+
+        return result;
+    }
+
+    public List<Double> transformToArray(){
+        List <Double> result = new ArrayList<>();
+
+        for(int i = 0; i < rows; ++i)
+            for(int j = 0; j < cols; ++j)
+                result.add(data[i][j]);
+
         return result;
     }
 
